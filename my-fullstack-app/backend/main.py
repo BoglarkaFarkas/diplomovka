@@ -133,7 +133,7 @@ async def create_item(
                 correct_answer = test.get_correct_answer(user["sub"], test_id, example_id)
                 c_answer.append(correct_answer)
                 answer_results = False
-                if str(correct_answer) == a:
+                if str(correct_answer) == a.lstrip("+"):
                     answer_results = True
                     points = points + 1
                 new_result.add_new_row(test_id, example_id, student_id, user["sub"], a, answer_results, submitted_at, image.filename)

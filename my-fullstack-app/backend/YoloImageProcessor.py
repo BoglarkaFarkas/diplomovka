@@ -157,6 +157,7 @@ class YOLOImageProcessor:
                     detections = self.filter_detections(detections)
 
                     sorted_numbers = [str(cls) for _, _, _, _, cls, _ in sorted(detections, key=lambda d: d[0])]
+                    sorted_numbers = ["+" if num == "11" else "-" if num == "10" else num for num in sorted_numbers]
                     recognized_number = "".join(sorted_numbers)
                     print(recognized_number)
                     answers.append(recognized_number)
