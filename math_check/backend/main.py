@@ -31,6 +31,7 @@ router = APIRouter()
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 JWT_SECRET = os.getenv("JWT_SECRET")  
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+JWT_EXPIRATION_HOURS = int(os.getenv("JWT_EXPIRATION_HOURS", 1))
 
 class TokenIn(BaseModel):
     id_token: str
@@ -54,7 +55,7 @@ async def login_with_google(token_in: TokenIn):
         payload = {
             "sub": user_email,
             "name": user_name,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60)
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=JWT_EXPIRATION_HOURS)
         }
         access_token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
@@ -130,8 +131,6 @@ async def create_item(
             submitted_at = datetime.datetime.utcnow().isoformat()
             for a, example_id in zip(answer, example_ids):
                 correct_answer = test.get_correct_answer(user["sub"], str(test_id), (example_id))
-                print("correct answer " + str(correct_answer))
-                print(user["sub"])
                 c_answer.append(correct_answer)
                 answer_results = False
                 if str(correct_answer) == a.lstrip("+"):
