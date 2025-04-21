@@ -58,7 +58,7 @@ function TestChecker() {
       setImageFile(null);
       setTimeout(() => setSubmitted(false), 3000);
     } catch (error) {
-      setResponse("Hiba történt a feltöltés során");
+      setResponse("Chyba pri nahrávanie obrázkov.");
     } finally {
       setLoading(false);
     }

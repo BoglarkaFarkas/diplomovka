@@ -41,7 +41,7 @@ function LoginPage({ onLogin }) {
         </p>
         <GoogleLogin
           onSuccess={handleLogin}
-          onError={() => console.log("Login Failed")}
+          onError={() => console.log("Chyba pri prihlaseni.")}
           useOneTap
         />
       </div>

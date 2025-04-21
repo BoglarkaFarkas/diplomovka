@@ -43,6 +43,8 @@ class CreateNewTest:
         :param user_email: the  email of the user/teacher who is logged in
         :return: the correct answer
         """
+        print(test_id)
+        print(example_id)
         query = {
             "user_email": user_email,
             "test_id": test_id,
@@ -53,9 +55,9 @@ class CreateNewTest:
             "_id": 0,               
             "correct_answer": 1   
         }
-
-        result = self.collection.find_one(query, projection)
-
+        
+        result = self.collection.find_one(query,projection)
+        print(result)
         if result:
             return result["correct_answer"]
         else:

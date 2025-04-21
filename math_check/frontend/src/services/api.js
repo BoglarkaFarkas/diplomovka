@@ -79,8 +79,3 @@ export const submitMatrixCalculation = async (data) => {
   const response = await axiosInstance.post(`/calculate/`, data);
   return response.data;
 };
-
-export const fetchWelcomeMessage = async () => {
-  const response = await axiosInstance.get(`/`);
-  return response.data.message;
-};

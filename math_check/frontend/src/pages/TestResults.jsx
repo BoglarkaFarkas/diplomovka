@@ -26,7 +26,7 @@ function TestResults() {
         const payload = JSON.parse(atob(token.split(".")[1]));
         setUserEmail(payload.sub || "");
       } catch (err) {
-        console.error("JWT decode hiba:", err);
+        console.error("JWT decode chyba:", err);
       }
     }
   }, []);
@@ -228,8 +228,8 @@ function TestResults() {
             <div className="input-group">
               <label>Nahrávanie CSV súboru</label>
               <p className="help-text">
-                CSV súbor by mal obsahovať stĺpce: test_id, example_id,
-                correct_answer, description (nepovinné)
+                CSV súbor by mal obsahovať stĺpce: test_id, cislo_ulohy,
+                spravna_odpoved, popis_ulohy (nepovinné)
               </p>
               <br />
               <button

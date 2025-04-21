@@ -23,7 +23,7 @@ from fastapi import Depends, Header
 from jose import JWTError, jwt
 import datetime
 from dotenv import load_dotenv
-
+import chardet
 
 load_dotenv()
 
@@ -89,9 +89,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello from FastAPI backend!"}
 
 @app.post("/items/")
 async def create_item(
@@ -122,7 +119,9 @@ async def create_item(
             id_values, example_ids,answer, student_id = processor.get_test_results(file_location)
             new_result = CreateNewResult()
             test = CreateNewTest()
-            test_id = id_values
+            test_id = None
+            if id_values is not None and len(id_values)>0:
+                test_id = id_values[0]
             example_ids_all.append(example_ids)
             test_ids.append(test_id)
             student_answers.append(answer)
@@ -130,7 +129,9 @@ async def create_item(
             c_answer = []
             submitted_at = datetime.datetime.utcnow().isoformat()
             for a, example_id in zip(answer, example_ids):
-                correct_answer = test.get_correct_answer(user["sub"], test_id, example_id)
+                correct_answer = test.get_correct_answer(user["sub"], str(test_id), (example_id))
+                print("correct answer " + str(correct_answer))
+                print(user["sub"])
                 c_answer.append(correct_answer)
                 answer_results = False
                 if str(correct_answer) == a.lstrip("+"):
@@ -142,7 +143,7 @@ async def create_item(
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error pri spracovaní obrázku: {str(e)}")
     return {
-        "message": f"{len(images)} image(s) uploaded.",
+        "message": f"{len(images)} obrazok bol nahratý.",
         "uploaded_files": uploaded_files,
         "student_ids": student_ids,
         "example_ids": example_ids_all,
@@ -222,22 +223,37 @@ async def upload_csv_examples(
     
     try:
         contents = await file.read()
-        csv_text = contents.decode('utf-8')
-        csv_reader = csv.DictReader(StringIO(csv_text))
+        try:
+            decoded_text = contents.decode('utf-8')
+        except UnicodeDecodeError:
+            decoded_text = contents.decode('windows-1250')
+        sample = decoded_text[:1024] 
+        sniffer = csv.Sniffer()
+        try:
+            dialect = sniffer.sniff(sample)
+        except csv.Error:
+            dialect = csv.excel 
+
+        csv_reader = csv.DictReader(StringIO(decoded_text), dialect=dialect)
+        
+        columns_needed = {"test_id", "cislo_ulohy", "spravna_odpoved"}
+        if not columns_needed.issubset(set(csv_reader.fieldnames)):
+            raise HTTPException(status_code=422,detail="File nemá všetky povinné stlpce")
+        
         new_test = CreateNewTest()   
         rows_added = 0
         errors = []
 
         for row in csv_reader:
             try:
-                if 'test_id' not in row or 'example_id' not in row or 'correct_answer' not in row:
+                if 'test_id' not in row or 'cislo_ulohy' not in row or 'spravna_odpoved' not in row:
                     errors.append(f"Riadok nemá všetky povinné polias: {row}")
                     continue
 
                 test_id = row['test_id']
-                example_id = row['example_id']
-                correct_answer = row['correct_answer']
-                description = row.get('description', "")
+                example_id = row['cislo_ulohy']
+                correct_answer = row['spravna_odpoved']
+                description = row.get('popis_ulohy', "")
 
                 new_test.add_new_row(test_id, example_id, correct_answer, user["sub"], description)
                 rows_added += 1

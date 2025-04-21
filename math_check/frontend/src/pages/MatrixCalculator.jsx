@@ -113,7 +113,8 @@ function MatrixCalculator() {
           Ak si nie ste istí správnou odpoveďou na konkrétnu otázku, môžete
           použiť jeden z dostupných kalkulačiek na určenie správneho výsledku.
           Keď získate odpoveď, môžete prejsť na stránku, kde ju môžete priamo
-          uložiť k príslušnej otázke.
+          uložiť k príslušnej otázke. Výsledky sú zaokrúhlené v prípade
+          normálnej vektorovej formy.
         </p>
         <div className="input-group">
           <label>Vyberte operáciu</label>
