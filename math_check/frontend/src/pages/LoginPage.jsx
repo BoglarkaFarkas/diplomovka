@@ -6,7 +6,7 @@ import { API_URL } from "../config";
 function LoginPage({ onLogin }) {
   const navigate = useNavigate();
 
-  const handleLogin = async (credentialResponse) => {
+  const handleLogin = async (credentialResponse, retry = false) => {
     try {
       const id_token = credentialResponse.credential;
 
@@ -17,6 +17,12 @@ function LoginPage({ onLogin }) {
         },
         body: JSON.stringify({ id_token }),
       });
+
+      if (res.status === 401 && !retry) {
+        console.warn("Token ešte nebol validný.");
+        setTimeout(() => handleLogin(credentialResponse, true), 1000);
+        return;
+      }
 
       const data = await res.json();
 
