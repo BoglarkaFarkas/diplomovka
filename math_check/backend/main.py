@@ -223,7 +223,7 @@ async def upload_csv_examples(
     try:
         contents = await file.read()
         try:
-            decoded_text = contents.decode('utf-8')
+            decoded_text = contents.decode('utf-8-sig')
         except UnicodeDecodeError:
             decoded_text = contents.decode('windows-1250')
         sample = decoded_text[:1024] 
@@ -313,7 +313,6 @@ async def delete_example(example_id: str, test_id: str, correct_answer: str, des
     """
     try:
         new_test = CreateNewTest()
-        # Delete the document from MongoDB
         result = new_test.collection.delete_one(
             {"example_id": example_id, "test_id": test_id, "user_email": user["sub"],"correct_answer": correct_answer, "description": description }
         )
