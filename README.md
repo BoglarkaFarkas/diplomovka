@@ -23,6 +23,8 @@ Once everything is ready, you can open the following link in your browser: [http
 
 ## Input Format Example
 
-To ensure correct evaluation, the structure of the exams must follow a specific format. Below is an example of a valid input format:
+To ensure correct evaluation, the structure of the exams must follow a specific format. Below are some examples of how an exam should look:
 
 ![Example test](./obrazok14.jpg)
+
+![Example test](./obrazok11.jpg)
