@@ -36,7 +36,7 @@ class YOLOImageProcessor:
 
     def filter_detections(self, detections):
         """
-        Selecting form bounding boxes
+        Selecting from bounding boxes
         :param detections: the detected bounding boxes
         :return: the filtered bounding boxes
         """
@@ -73,6 +73,7 @@ class YOLOImageProcessor:
         example_ids = [num[:-1] if num.endswith('.') else num for num in numbers_with_dot_filtered]
 
         answers = []
+        sorting_x = []
         student_id = None
         height_image, width_image = image.shape[:2]
 
@@ -125,7 +126,7 @@ class YOLOImageProcessor:
 
                 if w > 2 * h and w > 70:
                     cropped_rectangle = image[y_new:y_new + h_new, x_new:x_new + w_new]
-
+                    sorting_x.append(x_new)
                     scale = self.trained_with / w_new
 
                     height, width = cropped_rectangle.shape[:2]
@@ -142,9 +143,8 @@ class YOLOImageProcessor:
                     highlighted = cv2.bitwise_and(boosted, boosted, mask=dark_mask)
 
                     final = cv2.addWeighted(cropped_rectangle, 0.7, highlighted, 1.0, 0)
+                    results = self.model.predict(final)
 
-                    results = self.model.predict(source=final, conf=0.3, imgsz=max(cropped_rectangle.shape[:2]),
-                                                 rect=True)
                     detections = []
 
                     for result in results:
@@ -163,8 +163,10 @@ class YOLOImageProcessor:
                     answers.append(recognized_number)
 
         if len(answers) >= 2:
-            student_id = answers.pop()
+            x_last_last = sorting_x[-2]
+            x_last = sorting_x[-1]
+            if x_last_last > x_last:
+                student_id = answers.pop(-2)
+            else:
+                student_id = answers.pop()
         return id_values, example_ids, answers, student_id
-
-
-
