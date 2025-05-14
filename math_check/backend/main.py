@@ -24,6 +24,7 @@ from jose import JWTError, jwt
 import datetime
 from dotenv import load_dotenv
 import chardet
+import uuid
 
 load_dotenv()
 
@@ -110,8 +111,9 @@ async def create_item(
     correct_answers = []
     points = 0
     for image in images:
-        file_location = f"uploads/{image.filename}"
         try:
+            u_filename = f"{uuid.uuid4().hex}_{image.filename}"
+            file_location = f"uploads/{u_filename}"
             os.makedirs("uploads", exist_ok=True)
             with open(file_location, "wb") as buffer:
                 shutil.copyfileobj(image.file, buffer)
@@ -139,6 +141,7 @@ async def create_item(
                 new_result.add_new_row(test_id, example_id, student_id, user["sub"], a, answer_results, submitted_at, image.filename)
 
             correct_answers.append(c_answer)
+            os.remove(file_location)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error pri spracovaní obrázku: {str(e)}")
     return {
